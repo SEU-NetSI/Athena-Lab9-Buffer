@@ -78,11 +78,11 @@ static uint8_t BSP_W25Qx_GetStatus(void)
 
 /**********************************************************************************
  * 函数功能: 获取设备ID
+ * 待补充
  */
 void BSP_W25Qx_Read_ID(uint8_t *ID)
 {
-	uint8_t cmd[4] = {READ_ID_CMD, DUMMY_BYTE, DUMMY_BYTE, 0x00};
-	spiRead(cmd, 4, ID, 2, SPI3);
+
 }
 
 /**********************************************************************************
@@ -104,115 +104,31 @@ uint8_t BSP_W25Qx_WriteEnable(void)
 /**********************************************************************************
  * 函数功能: 读数据
  * 输入参数: 缓存数组指针、读地址、字节数
+ * 待补充
  */
 uint8_t BSP_W25Qx_Read(uint8_t* pData, uint32_t ReadAddr, uint32_t Size)
 {
-	uint8_t cmd[4];
 
-	/* Configure the command */
-	cmd[0] = READ_CMD;
-	cmd[1] = (uint8_t)(ReadAddr >> 16);
-	cmd[2] = (uint8_t)(ReadAddr >> 8);
-	cmd[3] = (uint8_t)(ReadAddr);
-
-	W25Qx_Enable();
-	/* Send the read ID command */
-	/* Reception of the data */
-	spiRead(cmd, 4, pData, Size, SPI3);
-	W25Qx_Disable();
-	return W25Qx_OK;
 }
 
 /**********************************************************************************
   * 函数功能: 写数据
   * 输入参数: 缓存数组指针、写地址、字节数
+  * 待补充
   */
 uint8_t BSP_W25Qx_Write(uint8_t* pData, uint32_t WriteAddr, uint32_t Size)
 {
-	uint8_t cmd[4];
-	uint32_t end_addr, current_size, current_addr;
 
-	/* Calculation of the size between the write address and the end of the page */
-  current_addr = 0;
-
-  while (current_addr <= WriteAddr)
-  {
-    current_addr += W25Q128FV_PAGE_SIZE;
-  }
-  current_size = current_addr - WriteAddr;
-
-  /* Check if the size of the data is less than the remaining place in the page */
-  if (current_size > Size)
-  {
-    current_size = Size;
-  }
-
-  /* Initialize the adress variables */
-  current_addr = WriteAddr;
-  end_addr = WriteAddr + Size;
-
-  /* Perform the write page by page */
-  do
-  {
-	/* Configure the command */
-	cmd[0] = PAGE_PROG_CMD;
-	cmd[1] = (uint8_t)(current_addr >> 16);
-	cmd[2] = (uint8_t)(current_addr >> 8);
-	cmd[3] = (uint8_t)(current_addr);
-
-	/* Enable write operations */
-	BSP_W25Qx_WriteEnable();
-
-	W25Qx_Enable_DMA();
-    /* Send the command */
-    if (!spiExchange(SPI3, 4, cmd, spiRxBuffer))
-    {
-      return W25Qx_ERROR;
-    }
-
-    /* Transmission of the data */
-    if (!spiExchange(SPI3, current_size, pData, spiRxBuffer))
-    {
-      return W25Qx_ERROR;
-    }
-	W25Qx_Disable_DMA();
-    /* Wait the end of Flash writing */
-	while(BSP_W25Qx_GetStatus() == W25Qx_BUSY);
-
-    /* Update the address and size variables for next page programming */
-    current_addr += current_size;
-    pData += current_size;
-    current_size = ((current_addr + W25Q128FV_PAGE_SIZE) > end_addr) ? (end_addr - current_addr) : W25Q128FV_PAGE_SIZE;
-  } while (current_addr < end_addr);
-
-	return W25Qx_OK;
 }
 
 /**********************************************************************************
   * 函数功能: 扇区擦除
   * 输入参数: 地址
+  * 待补充
   */
 uint8_t BSP_W25Qx_Erase_Block(uint32_t Address)
 {
-	uint8_t cmd[4];
-	cmd[0] = SECTOR_ERASE_CMD;
-	cmd[1] = (uint8_t)(Address >> 16);
-	cmd[2] = (uint8_t)(Address >> 8);
-	cmd[3] = (uint8_t)(Address);
 
-	/* Enable write operations */
-	BSP_W25Qx_WriteEnable();
-
-	/*Select the FLASH: Chip Select low */
-	W25Qx_Enable_DMA();
-	/* Send the read ID command */
-	spiExchange(SPI3, 4, cmd, spiRxBuffer);
-	/*Deselect the FLASH: Chip Select high */
-	W25Qx_Disable_DMA();
-
-	/* Wait the end of Flash writing */
-	while(BSP_W25Qx_GetStatus() == W25Qx_BUSY);
-	return W25Qx_OK;
 }
 
  /**********************************************************************************
