@@ -102,7 +102,7 @@ void MX_FREERTOS_Init(void) {
 
 	if (txComplete == NULL || rxComplete == NULL || spiMutex == NULL)
 	{
-	    // 处理信号量创建失�???
+	    // 处理信号量创建失败
 	    while (1);
 	}
 
@@ -172,7 +172,7 @@ void StartDefaultTask(void *argument)
 	  uint8_t sample[DATA_SIZE];
 	  for (int n = 0; n < 4; n++) {
 	    for (int i = 0; i < DATA_SIZE; i++) {
-	        sample[i] = (uint8_t)(n + i);  // 数据内容随 n 变化
+	        sample[i] = (uint8_t)(n * DATA_SIZE + i);  // 数据内容随 n 变化
 	    }
 	        buffer_push(&g_fifo, sample);
 	  }
